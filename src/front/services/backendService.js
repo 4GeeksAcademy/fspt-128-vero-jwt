@@ -1,5 +1,6 @@
+import { Navigate } from "react-router-dom"
 
-export const login = async (user, navigate) =>{
+export const login =  async(user) =>{
 
 
     
@@ -11,16 +12,14 @@ export const login = async (user, navigate) =>{
         }
     })
 
-    if(!response.ok){
-        // alert(response.error)
-        return jsonify({"error":"no estas registrado registrate"}),404
-    }
     const data= await response.json()
-    localStorage.setItem("token", data.token)
-   
+    localStorage.setItem("token", data.token);
+    return data;
+  
+  
 }
 
-export const register = async(user, navigate)=>{
+export const register = async(user)=>{
 
 
     const response= await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/register`,{
@@ -30,13 +29,28 @@ export const register = async(user, navigate)=>{
          "Content-Type":"application/json"
         }    
     })
-    const data = await response.json()
-    
+    const data = await response.json()   
     if (!response.ok){
         alert("algo salio mal en el registro")
-        return data
+        return;
     }
     return{ok:true}
-
+   
      
-}
+};
+
+export const privateCheck = async () => {
+    const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/profile`,
+        {
+         headers:{
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        },
+    );
+    const data = await response.json();
+        if(!response.ok){
+            return false;
+        }
+        return data;
+};

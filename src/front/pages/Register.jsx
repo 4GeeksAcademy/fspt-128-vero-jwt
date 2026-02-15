@@ -39,15 +39,11 @@ export const Register = () => {
 			return
 		}
 
-
+		setLoading(false)
 		navigate("/")
 
 	}
-	// useEffect({
-	// 	console.log("estos son los datos de user--->", user);
 
-
-	// }, [user])
 
 
 	return (

@@ -28,10 +28,13 @@ def register_user():
     data= request.get_json()
     email = data.get("email")
     password = data.get("password")
+    
     if not email or not password:
         return jsonify({"error":"todos los campos son requeridos"}),400
+    
     exisitin_user=db.session.execute(select(User).where(
         User.email== email)).scalar_one_or_none()
+    
     if exisitin_user:
         return jsonify({"error":"este usuario ya existe"}),400
     new_user= User(email= email)
@@ -48,17 +51,18 @@ def login():
     password = data.get("password")  
    
     if not email or not password:
-        return jsonify({"error":"todos los campos son requeridos"}),403
+        return jsonify({"error":"todos los campos son requeridos"}),400
     user=db.session.execute(select(User).where(
         User.email== email)).scalar_one_or_none()
+   
     if user is None:
-        return jsonify({"msg":"correo o password invalido"}),404
+        return jsonify({"msg":"correo o password invalido"}),400
    
     if user.check_password(password):
         access_token= create_access_token(identity=str(user.id))
         return jsonify({"msg":"login esxitoso","token":access_token}),200
     else:
-        return jsonify({"msg":"correo o password invalido"}),404
+        return jsonify({"msg":"correo o password invalido"}),400
 
 
 @api.route("/profile",methods=["GET"])
@@ -67,7 +71,7 @@ def get_profile():
     user_id = get_jwt_identity()
     user = db.session.get(User,user_id)
     if not user:
-        return jsonify({"msg":"usuario no encontrado"}),404
+        return jsonify({"error":"usuario no encontrado"}),400
     return jsonify(user.serialize()),200
 
     

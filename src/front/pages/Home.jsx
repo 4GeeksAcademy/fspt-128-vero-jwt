@@ -7,7 +7,11 @@ import { Link } from "react-router-dom";
 
 export const Home = () => {
 
-	const [ error ,setError] = useState("")
+
+
+
+
+	const [error, setError] = useState("")
 	const [loading, setLoading] = useState(false);
 	const { store, dispatch } = useGlobalReducer()
 	const navigate = useNavigate()
@@ -15,32 +19,6 @@ export const Home = () => {
 		email: "",
 		password: ""
 	})
-
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
-
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
-
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
-
-			return data
-
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
-
-	}
-
-	useEffect(() => {
-		loadMessage()
-	}, [])
 
 	const handleChange = (e) => {
 		setUser({
@@ -53,35 +31,25 @@ export const Home = () => {
 		e.preventDefault()
 
 		setError("");
-		if (!user.exist) {
-			setError("no existe el usuario");
-			setLoading(false)
-			return;
-		}
-
-
 		if (!user.email.trim() || !user.password.trim()) {
 			setError("email and passwords are required");
 			return;
 		}
 
+		
+		setLoading(true);
+		const response = await login(user)
 		if (response.error) {
 			setError(response.error)
 			setLoading(false)
 			return
 		}
-		
-		setLoading(true)
-		const response = await login(user)
-		console.log("este es el response--->",response);
-		
-		
-
-
 
 		navigate("/private")
 
 	}
+
+
 
 
 	return (
@@ -114,18 +82,24 @@ export const Home = () => {
 					<button className=" btn btn-success w-100 text-white macondo-swash-caps-regular" type="submit" disabled={loading} >
 						{loading ? (
 							<span className="d-inline-flex align-items-center gap-2"
-							role="status">
+								role="status">
 								<span className="spinner-border text-light"
-								role="status"
-								aria-hidden="true"
+									role="status"
+									aria-hidden="true"
 								></span>entrando...
-		
+
 							</span>
 						) : (
 							"logueate"
 						)}
 					</button>
 				</form>
+
+				<div className="ml-auto mt-3">
+					<Link to="/Register">
+						<button className="btn btn-primary">registrate</button>
+					</Link>
+				</div>
 			</div>
 		</div>
 	);
